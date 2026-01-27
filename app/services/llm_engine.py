@@ -5,7 +5,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
-from pydantic import ValidationError
+from pydantic import SecretStr, ValidationError
 
 from app.core.config import settings
 from app.schemas import LessonRequest, Presentation
@@ -83,7 +83,7 @@ class LLMEngine:
             return ChatOpenAI(
                 model=self.model,
                 temperature=self.temperature,
-                api_key=settings.OPENAI_API_KEY,
+                api_key=SecretStr(settings.OPENAI_API_KEY),
                 timeout=settings.DEFAULT_TIMEOUT,
                 max_retries=settings.DEFAULT_MAX_RETRIES,
             )
