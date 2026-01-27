@@ -125,10 +125,12 @@ class LLMEngine:
             context=request.context or "No specific context provided.",
         )
 
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", system_prompt),
-            ("user", user_prompt),
-        ])
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", system_prompt),
+                ("user", user_prompt),
+            ]
+        )
 
         # Use structured output to ensure Pydantic validation
         structured_llm = self.llm.with_structured_output(Presentation)
@@ -159,19 +161,16 @@ class LLMEngine:
             # Build chain with request-specific parameters
             chain = self._build_chain(request)
 
-            # Invoke chain asynchronously 
+            # Invoke chain asynchronously
             result = await chain.ainvoke({})
 
             # Validate result is a Presentation instance
             if not isinstance(result, Presentation):
                 raise LLMValidationError(
-                    f"LLM returned unexpected type: {type(result)}. "
-                    f"Expected Presentation."
+                    f"LLM returned unexpected type: {type(result)}. " f"Expected Presentation."
                 )
 
-            logger.info(
-                f"Successfully generated presentation with {len(result.slides)} slides"
-            )
+            logger.info(f"Successfully generated presentation with {len(result.slides)} slides")
             return result
 
         except ValidationError as e:
@@ -181,9 +180,7 @@ class LLMEngine:
             ) from e
         except Exception as e:
             logger.error(f"Error generating presentation: {e}", exc_info=True)
-            raise LLMGenerationError(
-                f"Failed to generate presentation: {str(e)}"
-            ) from e
+            raise LLMGenerationError(f"Failed to generate presentation: {str(e)}") from e
 
     async def stream_presentation(
         self, request: LessonRequest
@@ -230,6 +227,4 @@ class LLMEngine:
             ) from e
         except Exception as e:
             logger.error(f"Error streaming presentation: {e}", exc_info=True)
-            raise LLMGenerationError(
-                f"Failed to stream presentation: {str(e)}"
-            ) from e
+            raise LLMGenerationError(f"Failed to stream presentation: {str(e)}") from e

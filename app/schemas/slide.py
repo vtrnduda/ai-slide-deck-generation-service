@@ -58,7 +58,7 @@ class Slide(BaseModel):
         ),
         examples=["photosynthesis diagram", "French Revolution painting"],
     )
-    
+
     question: Optional[Question] = Field(
         default=None,
         description=(

@@ -21,7 +21,14 @@ class Question(BaseModel):
         min_length=2,
         max_length=5,
         description="List of answer options (typically 4 options: A, B, C, D)",
-        examples=[["A) Economic crisis", "B) Religious conflict", "C) Political reform", "D) Social inequality"]],
+        examples=[
+            [
+                "A) Economic crisis",
+                "B) Religious conflict",
+                "C) Political reform",
+                "D) Social inequality",
+            ]
+        ],
     )
     answer: str = Field(
         ...,

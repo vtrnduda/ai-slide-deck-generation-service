@@ -113,9 +113,7 @@ def mock_llm_engine_error() -> MagicMock:
     from app.services import LLMGenerationError
 
     mock = MagicMock(spec=LLMEngine)
-    mock.generate_presentation = AsyncMock(
-        side_effect=LLMGenerationError("API Error")
-    )
+    mock.generate_presentation = AsyncMock(side_effect=LLMGenerationError("API Error"))
     return mock
 
 

@@ -39,9 +39,7 @@ def create_test_settings(**env_vars):
                 return "google"
             if self.OPENAI_API_KEY:
                 return "openai"
-            raise ValueError(
-                "No LLM API key configured. Set OPENAI_API_KEY or GOOGLE_API_KEY."
-            )
+            raise ValueError("No LLM API key configured. Set OPENAI_API_KEY or GOOGLE_API_KEY.")
 
     # Keys to manage
     managed_keys = [

@@ -1,4 +1,3 @@
-
 SYSTEM_PROMPT = """
 You are an expert educational content creator specializing in creating engaging and pedagogically sound lesson presentations.
 
