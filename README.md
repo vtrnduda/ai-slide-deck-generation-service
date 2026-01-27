@@ -4,8 +4,15 @@ Backend service in Python using FastAPI to generate educational lesson slide dec
 
 ## 📋 Requirements
 
+### Local Development
 - Python 3.10 or higher
 - Poetry (dependency manager)
+
+### Docker (Alternative)
+- Docker 20.10+
+- Docker Compose v2+
+
+### Common
 - Git
 - API Key for at least one LLM provider:
   - OpenAI API Key ([Get one here](https://platform.openai.com/api-keys))
@@ -67,6 +74,60 @@ poetry run uvicorn app.main:app --reload
 ```
 
 The API will be available at `http://localhost:8000`
+
+## 🐳 Running with Docker
+
+### Prerequisites
+
+- Docker 20.10+
+- Docker Compose v2+
+
+### Option 1: Production Mode
+
+Build and run the production container:
+
+```bash
+# Build the image
+docker compose build api
+
+# Run the container
+docker compose up api
+```
+
+Or in a single command:
+```bash
+docker compose up api --build
+```
+
+### Option 2: Development Mode (with hot reload)
+
+Run with volume mounting for live code changes:
+
+```bash
+docker compose --profile dev up api-dev --build
+```
+
+Changes to files in `./app` will automatically reload the server.
+
+### Environment Variables
+
+Create a `.env` file before running (see `.env.example`):
+
+```bash
+cp .env.example .env
+# Edit .env with your API keys
+```
+
+The container will automatically load variables from `.env`.
+
+### Container Details
+
+| Aspect | Value |
+|--------|-------|
+| Base Image | `python:3.12-slim` |
+| Port | `8000` |
+| User | Non-root (`appuser`) |
+| Health Check | `GET /health` every 30s |
 
 ## 📖 API Documentation
 
@@ -213,6 +274,10 @@ ai-slide-deck-generation-service/
 ├── tests/                         # Test suite
 ├── .env.example                   # Environment variables template
 ├── pyproject.toml                 # Poetry dependencies and tool configs
+├── Dockerfile                     # Production Docker image
+├── Dockerfile.dev                 # Development Docker image (hot reload)
+├── docker-compose.yml             # Docker Compose configuration
+├── .dockerignore                  # Docker build exclusions
 └── README.md
 ```
 
