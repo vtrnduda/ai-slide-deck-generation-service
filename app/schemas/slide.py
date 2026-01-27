@@ -5,8 +5,6 @@ Each slide has a type, title, and content, with optional fields
 for images and interactive questions.
 """
 
-from typing import Optional
-
 from pydantic import BaseModel, Field, model_validator
 
 from app.schemas.enums import SlideType
@@ -46,7 +44,7 @@ class Slide(BaseModel):
         examples=["• First concept\n• Second concept\n• Third concept"],
     )
 
-    image: Optional[str] = Field(
+    image: str | None = Field(
         default=None,
         min_length=1,
         max_length=200,
@@ -59,7 +57,7 @@ class Slide(BaseModel):
         examples=["photosynthesis diagram", "French Revolution painting"],
     )
 
-    question: Optional[Question] = Field(
+    question: Question | None = Field(
         default=None,
         description=(
             "Optional multiple choice question for interactive learning. "

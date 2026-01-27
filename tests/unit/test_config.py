@@ -1,5 +1,6 @@
-import pytest
 import os
+
+import pytest
 
 
 def create_test_settings(**env_vars):
@@ -10,7 +11,6 @@ def create_test_settings(**env_vars):
     instance that ignores the .env file, and then restores the original env.
     """
     from pydantic_settings import BaseSettings, SettingsConfigDict
-    from typing import Optional
 
     # Define a test-only Settings class that ignores .env file
     class IsolatedSettings(BaseSettings):
@@ -21,15 +21,15 @@ def create_test_settings(**env_vars):
             extra="ignore",
         )
 
-        OPENAI_API_KEY: Optional[str] = None
-        GOOGLE_API_KEY: Optional[str] = None
+        OPENAI_API_KEY: str | None = None
+        GOOGLE_API_KEY: str | None = None
         ENVIRONMENT: str = "development"
         LOG_LEVEL: str = "INFO"
         DEFAULT_LLM_PROVIDER: str = "google"
         DEFAULT_MODEL: str = "gemini-2.0-flash"
         DEFAULT_TEMPERATURE: float = 0.5
         DEFAULT_MAX_RETRIES: int = 2
-        DEFAULT_TIMEOUT: Optional[int] = None
+        DEFAULT_TIMEOUT: int | None = None
 
         def get_llm_provider(self) -> str:
             """Get the LLM provider based on available keys."""

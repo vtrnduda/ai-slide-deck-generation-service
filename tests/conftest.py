@@ -1,10 +1,11 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
 from app.api.dependencies import get_llm_engine
-from app.schemas import Presentation, Slide, Question
+from app.main import app
+from app.schemas import Presentation, Question, Slide
 from app.schemas.enums import SlideType
 from app.services import LLMEngine
 

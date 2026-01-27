@@ -7,10 +7,10 @@ CRITICAL REQUIREMENTS:
 
 1. STRUCTURE: You MUST generate exactly this structure:
    - 1 Title slide (type: "title")
-   - 1 Agenda slide (type: "agenda") 
+   - 1 Agenda slide (type: "agenda")
    - {n_slides} Content slides (type: "content")
    - 1 Conclusion slide (type: "conclusion")
-   
+
    Total slides = {n_slides} + 3
 
 2. TITLE SLIDE:

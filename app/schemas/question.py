@@ -1,4 +1,4 @@
-from typing import List
+
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -16,7 +16,7 @@ class Question(BaseModel):
         description="The question statement related to the lesson content",
         examples=["What was the main cause of the French Revolution?"],
     )
-    options: List[str] = Field(
+    options: list[str] = Field(
         ...,
         min_length=2,
         max_length=5,

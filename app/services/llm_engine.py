@@ -1,5 +1,5 @@
 import logging
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable

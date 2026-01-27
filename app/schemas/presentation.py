@@ -5,7 +5,6 @@ Contains all slides in the required structure and validates
 the presentation follows the specified format.
 """
 
-from typing import List
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -35,7 +34,7 @@ class Presentation(BaseModel):
         description="The target student grade level (echoed from the request for context)",
         examples=["7th grade"],
     )
-    slides: List[Slide] = Field(
+    slides: list[Slide] = Field(
         ...,
         min_length=3,
         description=(
