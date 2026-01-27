@@ -65,7 +65,7 @@ class LLMEngine:
         """Get default model for the selected provider."""
         if self.provider == "openai":
             return "gpt-4"
-        return "gemini-1.5-flash"
+        return "gemini-2.0-flash"
 
     def _initialize_llm(self) -> ChatOpenAI | ChatGoogleGenerativeAI:
         """
@@ -101,26 +101,33 @@ class LLMEngine:
 
         raise ValueError(f"Unsupported LLM provider: {self.provider}")
 
-    def _build_chain(self, n_slides: int) -> Runnable:
+    def _build_chain(self, request: LessonRequest) -> Runnable:
         """
         Build the LangChain chain for presentation generation.
 
         Args:
-            n_slides: Number of content slides to generate.
+            request: Lesson request with all parameters.
 
         Returns:
             Configured LangChain Runnable chain.
         """
-        # Format system prompt with dynamic values
+        # Format all prompts completely before creating ChatPromptTemplate
         system_prompt = SYSTEM_PROMPT.format(
-            n_slides=n_slides,
-            grade="{grade}",
-            context="{context}",
+            n_slides=request.n_slides,
+            grade=request.grade,
+            context=request.context or "No specific context provided.",
+        )
+
+        user_prompt = USER_PROMPT_TEMPLATE.format(
+            topic=request.topic,
+            grade=request.grade,
+            n_slides=request.n_slides,
+            context=request.context or "No specific context provided.",
         )
 
         prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
-            ("user", USER_PROMPT_TEMPLATE),
+            ("user", user_prompt),
         ])
 
         # Use structured output to ensure Pydantic validation
@@ -150,18 +157,10 @@ class LLMEngine:
 
         try:
             # Build chain with request-specific parameters
-            chain = self._build_chain(request.n_slides)
+            chain = self._build_chain(request)
 
-            # Prepare input for the chain
-            chain_input = {
-                "topic": request.topic,
-                "grade": request.grade,
-                "context": request.context or "No specific context provided.",
-                "n_slides": request.n_slides,
-            }
-
-            # Invoke chain asynchronously
-            result = await chain.ainvoke(chain_input)
+            # Invoke chain asynchronously 
+            result = await chain.ainvoke({})
 
             # Validate result is a Presentation instance
             if not isinstance(result, Presentation):
@@ -208,17 +207,10 @@ class LLMEngine:
         )
 
         try:
-            chain = self._build_chain(request.n_slides)
+            chain = self._build_chain(request)
 
-            chain_input = {
-                "topic": request.topic,
-                "grade": request.grade,
-                "context": request.context or "No specific context provided.",
-                "n_slides": request.n_slides,
-            }
-
-            # Stream results
-            async for chunk in chain.astream(chain_input):
+            # Stream results (no input needed, prompts are pre-formatted)
+            async for chunk in chain.astream({}):
                 if isinstance(chunk, Presentation):
                     logger.debug(f"Received chunk with {len(chunk.slides)} slides")
                     yield chunk
