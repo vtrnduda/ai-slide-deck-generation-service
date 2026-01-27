@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,7 +18,24 @@ class Settings(BaseSettings):
     DEFAULT_MODEL: str = "gemini-1.5-flash"  # or "gpt-4" for OpenAI
     DEFAULT_TEMPERATURE: float = 0.5
     DEFAULT_MAX_RETRIES: int = 2
-    DEFAULT_TIMEOUT: int | None = None 
+    DEFAULT_TIMEOUT: int | None = None
+
+    @field_validator("DEFAULT_TIMEOUT", mode="before")
+    @classmethod
+    def parse_timeout(cls, v: str | int | None) -> int | None:
+        """
+        Parse timeout value from environment variable.
+        
+        Handles empty strings from .env file by converting them to None.
+        """
+        if v == "" or v is None:
+            return None
+        if isinstance(v, str):
+            try:
+                return int(v)
+            except ValueError:
+                return None
+        return v 
 
     model_config = SettingsConfigDict(
         env_file=".env",
