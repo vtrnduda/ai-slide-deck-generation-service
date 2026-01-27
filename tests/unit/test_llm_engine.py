@@ -1,5 +1,6 @@
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from unittest.mock import MagicMock, AsyncMock, patch
 
 from app.schemas import LessonRequest, Presentation
 from app.services.llm_engine import (
@@ -150,16 +151,15 @@ class TestDefaultModel:
         assert engine.model == "gpt-4"
 
 
-
 class TestGeneratePresentation:
     """Tests for presentation generation."""
 
     @pytest.fixture
     def mock_engine(self, sample_presentation: Presentation):
         """Create a mocked LLMEngine."""
-        with patch("app.services.llm_engine.settings") as mock_settings, \
-             patch("app.services.llm_engine.ChatGoogleGenerativeAI") as mock_gemini:
-
+        with patch("app.services.llm_engine.settings") as mock_settings, patch(
+            "app.services.llm_engine.ChatGoogleGenerativeAI"
+        ) as mock_gemini:
             mock_settings.get_llm_provider.return_value = "google"
             mock_settings.GOOGLE_API_KEY = "test-key"
             mock_settings.DEFAULT_TEMPERATURE = 0.5
@@ -218,9 +218,9 @@ class TestGeneratePresentation:
     @pytest.mark.asyncio
     async def test_generate_presentation_invalid_result_type(self):
         """Test that invalid result type raises LLMGenerationError with validation message."""
-        with patch("app.services.llm_engine.settings") as mock_settings, \
-             patch("app.services.llm_engine.ChatGoogleGenerativeAI") as mock_gemini:
-
+        with patch("app.services.llm_engine.settings") as mock_settings, patch(
+            "app.services.llm_engine.ChatGoogleGenerativeAI"
+        ) as mock_gemini:
             mock_settings.get_llm_provider.return_value = "google"
             mock_settings.GOOGLE_API_KEY = "test-key"
             mock_settings.DEFAULT_TEMPERATURE = 0.5
@@ -251,9 +251,9 @@ class TestGeneratePresentation:
     @pytest.mark.asyncio
     async def test_generate_presentation_llm_error(self):
         """Test that LLM errors are wrapped in LLMGenerationError."""
-        with patch("app.services.llm_engine.settings") as mock_settings, \
-             patch("app.services.llm_engine.ChatGoogleGenerativeAI") as mock_gemini:
-
+        with patch("app.services.llm_engine.settings") as mock_settings, patch(
+            "app.services.llm_engine.ChatGoogleGenerativeAI"
+        ) as mock_gemini:
             mock_settings.get_llm_provider.return_value = "google"
             mock_settings.GOOGLE_API_KEY = "test-key"
             mock_settings.DEFAULT_TEMPERATURE = 0.5
@@ -291,9 +291,9 @@ class TestStreamPresentation:
         sample_presentation: Presentation,
     ):
         """Test that stream_presentation yields Presentation objects."""
-        with patch("app.services.llm_engine.settings") as mock_settings, \
-             patch("app.services.llm_engine.ChatGoogleGenerativeAI") as mock_gemini:
-
+        with patch("app.services.llm_engine.settings") as mock_settings, patch(
+            "app.services.llm_engine.ChatGoogleGenerativeAI"
+        ) as mock_gemini:
             mock_settings.get_llm_provider.return_value = "google"
             mock_settings.GOOGLE_API_KEY = "test-key"
             mock_settings.DEFAULT_TEMPERATURE = 0.5
@@ -329,9 +329,9 @@ class TestStreamPresentation:
     @pytest.mark.asyncio
     async def test_stream_presentation_error(self):
         """Test that streaming errors are wrapped in LLMGenerationError."""
-        with patch("app.services.llm_engine.settings") as mock_settings, \
-             patch("app.services.llm_engine.ChatGoogleGenerativeAI") as mock_gemini:
-
+        with patch("app.services.llm_engine.settings") as mock_settings, patch(
+            "app.services.llm_engine.ChatGoogleGenerativeAI"
+        ) as mock_gemini:
             mock_settings.get_llm_provider.return_value = "google"
             mock_settings.GOOGLE_API_KEY = "test-key"
             mock_settings.DEFAULT_TEMPERATURE = 0.5

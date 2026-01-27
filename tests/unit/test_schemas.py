@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from app.schemas import LessonRequest, Presentation, Slide, Question
+from app.schemas import LessonRequest, Presentation, Question, Slide
 from app.schemas.enums import SlideType
 
 

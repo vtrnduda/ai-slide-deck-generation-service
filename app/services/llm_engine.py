@@ -1,11 +1,11 @@
 import logging
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
-from pydantic import ValidationError
+from pydantic import SecretStr, ValidationError
 
 from app.core.config import settings
 from app.schemas import LessonRequest, Presentation
@@ -83,7 +83,7 @@ class LLMEngine:
             return ChatOpenAI(
                 model=self.model,
                 temperature=self.temperature,
-                api_key=settings.OPENAI_API_KEY,
+                api_key=SecretStr(settings.OPENAI_API_KEY),
                 timeout=settings.DEFAULT_TIMEOUT,
                 max_retries=settings.DEFAULT_MAX_RETRIES,
             )
@@ -125,10 +125,12 @@ class LLMEngine:
             context=request.context or "No specific context provided.",
         )
 
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", system_prompt),
-            ("user", user_prompt),
-        ])
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", system_prompt),
+                ("user", user_prompt),
+            ]
+        )
 
         # Use structured output to ensure Pydantic validation
         structured_llm = self.llm.with_structured_output(Presentation)
@@ -159,19 +161,16 @@ class LLMEngine:
             # Build chain with request-specific parameters
             chain = self._build_chain(request)
 
-            # Invoke chain asynchronously 
+            # Invoke chain asynchronously
             result = await chain.ainvoke({})
 
             # Validate result is a Presentation instance
             if not isinstance(result, Presentation):
                 raise LLMValidationError(
-                    f"LLM returned unexpected type: {type(result)}. "
-                    f"Expected Presentation."
+                    f"LLM returned unexpected type: {type(result)}. " f"Expected Presentation."
                 )
 
-            logger.info(
-                f"Successfully generated presentation with {len(result.slides)} slides"
-            )
+            logger.info(f"Successfully generated presentation with {len(result.slides)} slides")
             return result
 
         except ValidationError as e:
@@ -181,9 +180,7 @@ class LLMEngine:
             ) from e
         except Exception as e:
             logger.error(f"Error generating presentation: {e}", exc_info=True)
-            raise LLMGenerationError(
-                f"Failed to generate presentation: {str(e)}"
-            ) from e
+            raise LLMGenerationError(f"Failed to generate presentation: {str(e)}") from e
 
     async def stream_presentation(
         self, request: LessonRequest
@@ -230,6 +227,4 @@ class LLMEngine:
             ) from e
         except Exception as e:
             logger.error(f"Error streaming presentation: {e}", exc_info=True)
-            raise LLMGenerationError(
-                f"Failed to stream presentation: {str(e)}"
-            ) from e
+            raise LLMGenerationError(f"Failed to stream presentation: {str(e)}") from e

@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     def parse_timeout(cls, v: str | int | None) -> int | None:
         """
         Parse timeout value from environment variable.
-        
+
         Handles empty strings from .env file by converting them to None.
         """
         if v == "" or v is None:
@@ -35,7 +35,7 @@ class Settings(BaseSettings):
                 return int(v)
             except ValueError:
                 return None
-        return v 
+        return v
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -50,9 +50,7 @@ class Settings(BaseSettings):
             return "openai"
         if self.GOOGLE_API_KEY:
             return "google"
-        raise ValueError(
-            "No LLM provider configured. Please set OPENAI_API_KEY or GOOGLE_API_KEY"
-        )
+        raise ValueError("No LLM provider configured. Please set OPENAI_API_KEY or GOOGLE_API_KEY")
 
 
 settings = Settings()

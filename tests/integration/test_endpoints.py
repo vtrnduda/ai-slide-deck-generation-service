@@ -1,11 +1,11 @@
-import pytest
-from unittest.mock import MagicMock, AsyncMock
-from fastapi.testclient import TestClient
-from fastapi import status
+from unittest.mock import AsyncMock, MagicMock
 
-from app.main import app
+from fastapi import status
+from fastapi.testclient import TestClient
+
 from app.api.dependencies import get_llm_engine
-from app.services import LLMGenerationError, LLMValidationError
+from app.main import app
+from app.services import LLMValidationError
 
 
 class TestGenerateSlides:

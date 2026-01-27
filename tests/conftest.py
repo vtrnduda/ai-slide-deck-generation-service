@@ -1,10 +1,11 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
 from app.api.dependencies import get_llm_engine
-from app.schemas import Presentation, Slide, Question
+from app.main import app
+from app.schemas import Presentation, Question, Slide
 from app.schemas.enums import SlideType
 from app.services import LLMEngine
 
@@ -113,9 +114,7 @@ def mock_llm_engine_error() -> MagicMock:
     from app.services import LLMGenerationError
 
     mock = MagicMock(spec=LLMEngine)
-    mock.generate_presentation = AsyncMock(
-        side_effect=LLMGenerationError("API Error")
-    )
+    mock.generate_presentation = AsyncMock(side_effect=LLMGenerationError("API Error"))
     return mock
 
 

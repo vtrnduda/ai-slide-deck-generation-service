@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
@@ -45,19 +45,19 @@ async def generate_slides(
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f"Generated content doesn't match expected schema: {str(e)}",
-        )
+        ) from e
     except LLMGenerationError as e:
         logger.error(f"Generation error: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"AI generation failed: {str(e)}",
-        )
+        ) from e
     except Exception as e:
         logger.error(f"Unexpected error generating slides: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred. Please try again later.",
-        )
+        ) from e
 
 
 @router.post(

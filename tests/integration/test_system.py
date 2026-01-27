@@ -1,6 +1,5 @@
-import pytest
-from fastapi.testclient import TestClient
 from fastapi import status
+from fastapi.testclient import TestClient
 
 
 class TestRootEndpoint:

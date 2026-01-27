@@ -76,4 +76,4 @@ class LessonRequest(BaseModel):
     @model_validator(mode="after")
     def validate_request(self) -> "LessonRequest":
         """Additional cross-field validations if needed."""
-        return self #TODO: Add validations like checking if topic + context don't exceed certain limits
+        return self  # TODO: Add validations like checking if topic + context don't exceed certain limits
