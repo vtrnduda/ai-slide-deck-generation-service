@@ -270,9 +270,7 @@ class LLMEngine:
         if slide_type == SlideType.TITLE:
             user_prompt = TITLE_SLIDE_PROMPT.format(topic=request.topic)
         elif slide_type == SlideType.AGENDA:
-            agenda_items = "\n".join(
-                f"- {item}" for item in kwargs.get("subtopics", [])
-            )
+            agenda_items = "\n".join(f"- {item}" for item in kwargs.get("subtopics", []))
             user_prompt = AGENDA_SLIDE_PROMPT.format(
                 topic=request.topic,
                 n_slides=request.n_slides,
@@ -306,9 +304,7 @@ class LLMEngine:
                 question_instruction=question_instruction,
             )
         elif slide_type == SlideType.CONCLUSION:
-            covered_topics = "\n".join(
-                f"- {item}" for item in kwargs.get("subtopics", [])
-            )
+            covered_topics = "\n".join(f"- {item}" for item in kwargs.get("subtopics", []))
             user_prompt = CONCLUSION_SLIDE_PROMPT.format(
                 topic=request.topic,
                 covered_topics=covered_topics,
@@ -343,9 +339,7 @@ class LLMEngine:
 
         return result
 
-    async def stream_presentation(
-        self, request: LessonRequest
-    ) -> AsyncGenerator[Slide, None]:
+    async def stream_presentation(self, request: LessonRequest) -> AsyncGenerator[Slide, None]:
         """
         Generate presentation slide by slide via streaming.
 
@@ -375,9 +369,7 @@ class LLMEngine:
 
             # Step 2: Generate title slide
             logger.debug("Generating title slide...")
-            title_slide = await self._generate_single_slide(
-                request, SlideType.TITLE
-            )
+            title_slide = await self._generate_single_slide(request, SlideType.TITLE)
             yield title_slide
             logger.debug("Title slide generated and yielded")
 
@@ -427,15 +419,12 @@ class LLMEngine:
             logger.debug("Conclusion slide generated and yielded")
 
             logger.info(
-                f"Successfully streamed presentation with "
-                f"{request.n_slides + 3} slides"
+                f"Successfully streamed presentation with " f"{request.n_slides + 3} slides"
             )
 
         except ValidationError as e:
             logger.error(f"Pydantic validation error during streaming: {e}")
-            raise LLMValidationError(
-                f"Streamed content doesn't match Slide schema: {e}"
-            ) from e
+            raise LLMValidationError(f"Streamed content doesn't match Slide schema: {e}") from e
         except Exception as e:
             logger.error(f"Error streaming presentation: {e}", exc_info=True)
             raise LLMGenerationError(f"Failed to stream presentation: {str(e)}") from e
