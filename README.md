@@ -272,6 +272,19 @@ ai-slide-deck-generation-service/
 │       └── llm_engine.py          # LLM orchestration with LangChain
 │
 ├── tests/                         # Test suite
+│   ├── conftest.py                # Shared fixtures
+│   ├── unit/                      # Unit tests
+│   │   ├── test_schemas.py
+│   │   ├── test_config.py
+│   │   └── test_llm_engine.py
+│   └── integration/               # Integration tests
+│       ├── test_endpoints.py
+│       └── test_system.py
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml                 # CI pipeline (lint, test, build)
+│
 ├── .env.example                   # Environment variables template
 ├── pyproject.toml                 # Poetry dependencies and tool configs
 ├── Dockerfile                     # Production Docker image
