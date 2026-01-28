@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
 
     # LLM Configuration
-    DEFAULT_LLM_PROVIDER: str = "google" 
-    DEFAULT_MODEL: str = "gemini-2.0-flash"  
+    DEFAULT_LLM_PROVIDER: str = "google"
+    DEFAULT_MODEL: str = "gemini-2.0-flash"
     FALLBACK_MODEL: str = "gpt-4o"
     DEFAULT_TEMPERATURE: float = 0.5
     DEFAULT_MAX_RETRIES: int = 2
