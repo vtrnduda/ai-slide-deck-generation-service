@@ -60,7 +60,7 @@ LOG_LEVEL=INFO
 
 # LLM Configuration (optional - all have defaults)
 DEFAULT_LLM_PROVIDER=google
-DEFAULT_MODEL=gemini-1.5-flash
+DEFAULT_MODEL=gemini-2.0-flash
 DEFAULT_TEMPERATURE=0.5
 DEFAULT_MAX_RETRIES=2
 ```
@@ -136,6 +136,26 @@ Once the server is running, interactive API documentation is available at:
 - **Swagger UI**: `http://localhost:8000/docs`
 - **ReDoc**: `http://localhost:8000/redoc`
 
+## ⚡ Quick Test
+
+Test the API with curl after starting the server:
+
+```bash
+# Health check
+curl http://localhost:8000/health
+
+# Generate presentation (complete response)
+curl -X POST http://localhost:8000/api/v1/slide \
+  -H "Content-Type: application/json" \
+  -d '{"topic": "Solar System", "grade": "5th grade", "n_slides": 3}'
+
+# Generate presentation (streaming)
+curl -X POST http://localhost:8000/api/v1/streaming \
+  -H "Content-Type: application/json" \
+  -d '{"topic": "Solar System", "grade": "5th grade", "n_slides": 3}' \
+  --no-buffer
+```
+
 ## 🌐 API Endpoints
 
 ### System Endpoints
@@ -163,7 +183,7 @@ Health check endpoint for monitoring and container health probes.
   "status": "ok",
   "environment": "development",
   "llm_provider": "google",
-  "default_model": "gemini-1.5-flash"
+  "default_model": "gemini-2.0-flash"
 }
 ```
 
@@ -231,11 +251,32 @@ Generates a complete presentation with all slides at once.
 **Note:** Total slides = `n_slides` + 3 (title + agenda + conclusion)
 
 #### `POST /api/v1/streaming`
-Streams the presentation slide by slide using Server-Sent Events (SSE).
+Streams the presentation slide by slide using Server-Sent Events (SSE). Each slide is sent as soon as it's generated.
 
 **Request Body:** Same as `/api/v1/slide`
 
-**Response:** Server-Sent Events stream
+**Response:** Server-Sent Events stream with individual slides:
+
+```
+data: {"type": "title", "title": "Introduction to Photosynthesis", "content": "...", "image": null, "question": null}
+
+data: {"type": "agenda", "title": "What We'll Learn", "content": "• Topic 1\n• Topic 2", "image": null, "question": null}
+
+data: {"type": "content", "title": "First Concept", "content": "...", "image": "photosynthesis diagram", "question": null}
+
+data: {"type": "conclusion", "title": "Summary", "content": "...", "image": null, "question": null}
+
+event: done
+data: [DONE]
+```
+
+**Consuming with curl:**
+```bash
+curl -X POST http://localhost:8000/api/v1/streaming \
+  -H "Content-Type: application/json" \
+  -d '{"topic": "Photosynthesis", "grade": "7th grade", "n_slides": 3}' \
+  --no-buffer
+```
 
 ## 📁 Project Structure
 
@@ -272,6 +313,19 @@ ai-slide-deck-generation-service/
 │       └── llm_engine.py          # LLM orchestration with LangChain
 │
 ├── tests/                         # Test suite
+│   ├── conftest.py                # Shared fixtures
+│   ├── unit/                      # Unit tests
+│   │   ├── test_schemas.py
+│   │   ├── test_config.py
+│   │   └── test_llm_engine.py
+│   └── integration/               # Integration tests
+│       ├── test_endpoints.py
+│       └── test_system.py
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml                 # CI pipeline (lint, test, build)
+│
 ├── .env.example                   # Environment variables template
 ├── pyproject.toml                 # Poetry dependencies and tool configs
 ├── Dockerfile                     # Production Docker image
@@ -294,7 +348,7 @@ All configuration is done through environment variables (via `.env` file):
 | `ENVIRONMENT` | Environment (development/staging/production) | `development` | No |
 | `LOG_LEVEL` | Logging level (DEBUG/INFO/WARNING/ERROR) | `INFO` | No |
 | `DEFAULT_LLM_PROVIDER` | Default LLM provider (`openai` or `google`) | `google` | No |
-| `DEFAULT_MODEL` | Default model name | `gemini-1.5-flash` | No |
+| `DEFAULT_MODEL` | Default model name | `gemini-2.0-flash` | No |
 | `DEFAULT_TEMPERATURE` | Sampling temperature (0.0-2.0) | `0.5` | No |
 | `DEFAULT_MAX_RETRIES` | Maximum retry attempts | `2` | No |
 | `DEFAULT_TIMEOUT` | Request timeout in seconds | `None` | No |

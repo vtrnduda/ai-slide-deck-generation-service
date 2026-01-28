@@ -14,8 +14,9 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
 
     # LLM Configuration
-    DEFAULT_LLM_PROVIDER: str = "google"  # "openai" or "google"
-    DEFAULT_MODEL: str = "gemini-1.5-flash"  # or "gpt-4" for OpenAI
+    DEFAULT_LLM_PROVIDER: str = "google" 
+    DEFAULT_MODEL: str = "gemini-2.0-flash"  
+    FALLBACK_MODEL: str = "gpt-4o"
     DEFAULT_TEMPERATURE: float = 0.5
     DEFAULT_MAX_RETRIES: int = 2
     DEFAULT_TIMEOUT: int | None = None

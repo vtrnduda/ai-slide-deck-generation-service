@@ -65,10 +65,11 @@ async def generate_slides(
     summary="Stream presentation slide by slide",
     description=(
         "Generates and streams the presentation slide by slide using Server-Sent Events (SSE). "
-        "The client receives slides as they are generated, allowing for progressive rendering. "
+        "The client receives each slide as it is generated, allowing for progressive rendering. "
+        "Each SSE event contains a complete, validated Slide object. "
         "Use this endpoint when you want to show slides to users as they become available."
     ),
-    response_description="Server-Sent Events stream with presentation chunks",
+    response_description="Server-Sent Events stream with individual slides",
     tags=["Presentations"],
 )
 async def generate_slides_stream(
@@ -78,45 +79,52 @@ async def generate_slides_stream(
     """
     Stream presentation generation via Server-Sent Events (SSE).
 
-    This endpoint streams the presentation slide by slide as they are generated.
-    Each chunk contains a partial or complete Presentation object.
+    This endpoint generates and streams slides one by one as they are created.
+    Each SSE event contains a complete Slide object (title, agenda, content, or conclusion).
+
+    Event format:
+    - data: {slide JSON} - For each generated slide
+    - event: done, data: [DONE] - When generation is complete
+    - event: error, data: {error JSON} - If an error occurs
     """
 
     async def sse_generator() -> AsyncGenerator[str, None]:
+        slide_count = 0
         try:
-            async for chunk in engine.stream_presentation(request):
-                if hasattr(chunk, "model_dump"):
-                    data = json.dumps(chunk.model_dump())
-                elif hasattr(chunk, "dict"):
-                    data = json.dumps(chunk.dict())
-                elif isinstance(chunk, dict):
-                    data = json.dumps(chunk)
-                else:
-                    data = json.dumps(str(chunk))
-
+            async for slide in engine.stream_presentation(request):
+                slide_count += 1
+                data = json.dumps(slide.model_dump(), ensure_ascii=False)
                 yield f"data: {data}\n\n"
 
             yield "event: done\ndata: [DONE]\n\n"
+            logger.info(f"Successfully streamed {slide_count} slides")
 
         except LLMValidationError as e:
             logger.error(f"Validation error in stream: {e}")
-            error_data = json.dumps({"error": "Validation error", "detail": str(e)})
+            error_data = json.dumps(
+                {"error": "Validation error", "detail": str(e)}, ensure_ascii=False
+            )
             yield f"event: error\ndata: {error_data}\n\n"
         except LLMGenerationError as e:
             logger.error(f"Generation error in stream: {e}")
-            error_data = json.dumps({"error": "Generation error", "detail": str(e)})
+            error_data = json.dumps(
+                {"error": "Generation error", "detail": str(e)}, ensure_ascii=False
+            )
             yield f"event: error\ndata: {error_data}\n\n"
         except Exception as e:
             logger.error(f"Error in stream: {e}", exc_info=True)
-            error_data = json.dumps({"error": "Unexpected error", "detail": str(e)})
+            error_data = json.dumps(
+                {"error": "Unexpected error", "detail": str(e)}, ensure_ascii=False
+            )
             yield f"event: error\ndata: {error_data}\n\n"
 
     return StreamingResponse(
         sse_generator(),
-        media_type="text/event-stream",
+        media_type="text/event-stream; charset=utf-8",
         headers={
-            "Cache-Control": "no-cache",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",
+            "Transfer-Encoding": "chunked",
         },
     )
