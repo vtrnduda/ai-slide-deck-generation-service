@@ -64,3 +64,82 @@ Number of Content Slides: {n_slides}
 Additional Context: {context}
 
 Generate a complete presentation following the structure and requirements specified in the system prompt."""
+
+
+# --- Prompts for slide-by-slide streaming generation ---
+
+SLIDE_SYSTEM_PROMPT = """
+You are an expert educational content creator. Generate a SINGLE slide for a lesson presentation.
+
+REQUIREMENTS:
+- Grade level: {grade}
+- Language and complexity must be appropriate for this grade level
+- Content must be accurate, educational, and pedagogically sound
+- Keep text concise and readable (slides should not be text-heavy)
+- Additional context to consider: {context}
+"""
+
+TITLE_SLIDE_PROMPT = """
+Generate a TITLE slide for a lesson about: {topic}
+
+The title slide should:
+- Have an engaging, clear title related to the topic
+- Content should introduce the lesson topic prominently
+- Be simple and visually appealing
+
+Generate ONLY the title slide with type "title".
+"""
+
+AGENDA_SLIDE_PROMPT = """
+Generate an AGENDA slide for a lesson about: {topic}
+
+The agenda should list these {n_slides} main topics that will be covered:
+{agenda_items}
+
+Format the content as bullet points. Generate ONLY the agenda slide with type "agenda".
+"""
+
+CONTENT_SLIDE_PROMPT = """
+Generate a CONTENT slide for a lesson about: {topic}
+
+This is slide {slide_number} of {total_content_slides} content slides.
+The specific subtopic for this slide is: {subtopic}
+
+Requirements:
+- Clear, objective title related to the subtopic
+- Content with bullet points or short paragraphs
+- Educational and appropriate for grade level
+{image_instruction}
+{question_instruction}
+
+Generate ONLY this content slide with type "content".
+"""
+
+CONCLUSION_SLIDE_PROMPT = """
+Generate a CONCLUSION slide for a lesson about: {topic}
+
+The lesson covered these main points:
+{covered_topics}
+
+The conclusion should:
+- Summarize key points from the lesson
+- Reinforce learning objectives
+- Be concise and memorable
+
+Generate ONLY the conclusion slide with type "conclusion".
+"""
+
+AGENDA_PLANNING_PROMPT = """
+You are planning a lesson about: {topic}
+Grade level: {grade}
+Number of content slides: {n_slides}
+Additional context: {context}
+
+Generate a list of {n_slides} subtopics/sections that should be covered in this lesson.
+Return ONLY a JSON array of strings, each being a subtopic title.
+
+Example output for a 3-slide lesson about "Photosynthesis":
+["What is Photosynthesis?", "The Light-Dependent Reactions", "The Calvin Cycle"]
+
+Generate the subtopics now:
+"""
